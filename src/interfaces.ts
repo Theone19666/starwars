@@ -12,7 +12,7 @@ export interface Person {
 	name: string;
 	skin_color: string;
 	species: string[];
-	starships: string[] | Starship[];
+	starships: string[];
 	url: string;
 	vehicles: string[];
 }

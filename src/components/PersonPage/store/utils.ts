@@ -2,9 +2,9 @@ import { Person, Starship } from "@/interfaces";
 
 export default function setStarships(person: Person, starships: Starship[]) {
 	const personCopy = { ...person };
-	const starshipsNames: Starship[] = personCopy.starships?.map((starship: string) => {
+	const starshipsNames = personCopy.starships.map((starship) => {
 		return starships.find((item: Starship) => item.url === starship)?.name;
 	});
-	personCopy.starships = starshipsNames;
+	personCopy.starships = starshipsNames as string[];
 	return personCopy;
 }

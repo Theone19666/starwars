@@ -6,10 +6,10 @@ export default function setStarships(persons: Person[], starships: Starship[]) {
 			return person;
 		}
 		const personCopy = { ...person };
-		const starshipsNames: Starship[] = personCopy.starships.map((starship: string) => {
+		const starshipsNames = personCopy.starships.map((starship: string) => {
 			return starships.find((item: Starship) => item.url === starship)?.name;
 		});
-		personCopy.starships = starshipsNames;
+		personCopy.starships = starshipsNames as string[];
 		return personCopy;
 	});
 }
