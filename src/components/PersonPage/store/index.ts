@@ -47,7 +47,7 @@ export default {
 		loadPersonInfo: async ({ commit }: IObject, personId: string) => {
 			commit("setErrorMessage", "");
 			axios
-				.get(`${BASE_URL}/people/${personId}`)
+				.get(`${BASE_URL}/people/${personId}/`)
 				.then(({ data }: AxiosResponse) => {
 					commit("loadPersonInfo", data);
 				})
