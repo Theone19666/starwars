@@ -9,3 +9,18 @@
     color: transparent;
   }
 }
+.error {
+  position: fixed;
+  bottom: 0;
+  right: 16px;
+  z-index: 9;
+}
+.title-container {
+  border-bottom: thin solid rgba(0, 0, 0, 0.12);
+}
+
+.starship-container {
+  .starship:not(:last-child) {
+    margin-bottom: 3px;
+  }
+}

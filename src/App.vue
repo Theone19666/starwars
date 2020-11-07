@@ -22,9 +22,18 @@
 
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
+import { mapActions } from "vuex";
 
-@Component
-export default class App extends Vue {}
+@Component({
+	methods: mapActions(["loadStarships"]),
+})
+export default class App extends Vue {
+	loadStarships!: Function;
+
+	created() {
+		this.loadStarships();
+	}
+}
 </script>
 
 <style lang="scss" scoped>

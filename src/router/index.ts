@@ -17,6 +17,12 @@ const routes: Array<RouteConfig> = [
 		// prettier-ignore
 		component: () => import(/* webpackChunkName: "person" */ "../components/PersonPage/PersonPage.vue"),
 	},
+	{
+		path: "*",
+		name: "notfound",
+		// prettier-ignore
+		component: () => import(/* webpackChunkName: "notfound" */ "../components/NotFound/NotFound.vue"),
+	},
 ];
 
 const router = new VueRouter({

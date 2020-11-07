@@ -1,25 +1,51 @@
 <template>
 	<v-container>
-		<h1 class="text-center">Star Wars people list</h1>
+		<h1 class="text-center">Star Wars characters list</h1>
 		<div class="text-center progress-bar" v-if="isLoading">
 			<v-progress-circular indeterminate color="#419494"></v-progress-circular>
 		</div>
 		<v-row v-else>
-			<v-col v-for="(item, index) of people" :key="index" lg="6" md="6" sm="6" cols="12">
+			<v-col
+				v-for="(item, index) of personsWithStarships"
+				:key="index"
+				lg="6"
+				md="6"
+				sm="6"
+				cols="12"
+			>
 				<v-card outlined>
-					<v-card-title class="justify-center">{{ item.name }}</v-card-title>
+					<v-card-title class="justify-center title-container">{{ item.name }}</v-card-title>
 					<v-card-text>
 						<v-row>
-							<v-col>Height</v-col>
-							<v-col class="text-right">{{ item.height || "unknown" }}</v-col>
-						</v-row>
-						<v-row>
-							<v-col>Mass</v-col>
-							<v-col class="text-right">{{ item.mass || "unknown" }}</v-col>
+							<v-col>Birth year</v-col>
+							<v-col class="text-right">{{ item.birth_year || "unknown" }}</v-col>
 						</v-row>
 						<v-row>
 							<v-col>Gender</v-col>
 							<v-col class="text-right">{{ item.gender || "unknown" }}</v-col>
+						</v-row>
+						<v-row>
+							<v-col>Starships</v-col>
+							<v-col>
+								<v-row
+									v-if="item.starships.length"
+									class="flex-column starship-container"
+									justify="center"
+									align="end"
+								>
+									<v-badge
+										v-for="(starship, starshipIndex) of item.starships"
+										:key="starshipIndex"
+										:content="starship"
+										inline
+										color="#008cff"
+										class="starship"
+									/>
+								</v-row>
+								<v-row class="flex-column" justify="center" align="end" v-else>
+									<v-badge inline content="No starships" color="red" />
+								</v-row>
+							</v-col>
 						</v-row>
 					</v-card-text>
 					<v-card-actions class="justify-center">
@@ -27,13 +53,13 @@
 							class="back-btn"
 							:to="{ name: 'person', params: { id: getPersonId(index) } }"
 						>
-							<v-btn color="#419494">See more info</v-btn>
+							<v-btn dark color="#419494">See more info</v-btn>
 						</router-link>
 					</v-card-actions>
 				</v-card>
 			</v-col>
 		</v-row>
-		<div class="text-center" v-if="!isLoading">
+		<div class="text-center" v-if="personsWithStarships.length">
 			<v-pagination
 				v-model="page"
 				:length="peopleCount"
@@ -41,55 +67,68 @@
 				@input="onPaginationChange"
 			/>
 		</div>
+		<v-alert type="error" v-if="error" class="error"
+			>An error occurred while receiving data</v-alert
+		>
 	</v-container>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
-import { PeopleRequestResult, Person } from "@/interfaces";
-import BASE_URL from "@/config";
+import { mapState, mapActions, mapGetters, mapMutations } from "vuex";
+import { Person } from "@/interfaces";
 
-@Component
+import { namespace } from "./store";
+
+@Component({
+	computed: {
+		...mapState(namespace, ["persons", "peopleCount", "isLoading", "error"]),
+		...mapGetters(namespace, ["personsWithStarships"]),
+	},
+	methods: {
+		...mapActions(namespace, ["loadPersons"]),
+		...mapMutations(namespace, ["setIsLoading"]),
+	},
+})
 export default class PersonsList extends Vue {
-	people: Person[] = [];
+	persons!: Person[];
 
-	peopleCount = 0;
+	peopleCount!: boolean;
 
 	page = 1;
 
-	isLoading = false;
+	isLoading!: boolean;
 
-	getPersons(page = 1): void {
-		if (page < 1) return;
-		this.isLoading = true;
-		// prettier-ignore
-		const url = page === 1 ? `${BASE_URL}/people` : `${BASE_URL}/people?page=${page}`;
-		fetch(url)
-			.then((result) => result.json())
-			.then((result: PeopleRequestResult) => {
-				this.people = result.results as Person[];
-				this.peopleCount = Math.ceil(result.count / 10);
-				this.page = page;
-				this.isLoading = false;
-			});
-	}
+	error!: boolean;
+
+	personsWithStarships!: Person[];
+
+	loadPersons!: Function;
+
+	setIsLoading!: Function;
 
 	getPage() {
 		return Number(this.$route.query?.page) || 1;
 	}
 
 	getPersonId(index: number) {
-		return this.page === 1 ? index + 1 : index + 11;
+		const page = this.getPage();
+		return this.page === 1 ? index + 1 : (page - 1) * 10 + (index + 1);
+	}
+
+	dispatchLoadPersons(page: number): void {
+		this.setIsLoading(true);
+		this.loadPersons(page);
 	}
 
 	onPaginationChange(pageNumber: number): void {
 		this.$router.push({ name: "home", query: { page: String(pageNumber) } });
-		this.getPersons(pageNumber);
+		this.dispatchLoadPersons(pageNumber);
 	}
 
 	created() {
 		this.page = this.getPage();
-		this.getPersons(this.page);
+		this.dispatchLoadPersons(this.page);
 	}
 }
 </script>
