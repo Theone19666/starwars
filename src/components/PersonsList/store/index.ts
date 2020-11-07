@@ -45,6 +45,7 @@ export default {
 	},
 	actions: {
 		loadPersons: async ({ commit }: IObject, page: number) => {
+			commit("setIsLoading", true);
 			const url = page === 1 ? `${BASE_URL}/people/` : `${BASE_URL}/people/?page=${page}`;
 			axios
 				.get(url)

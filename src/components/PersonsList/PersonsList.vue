@@ -59,7 +59,7 @@
 				</v-card>
 			</v-col>
 		</v-row>
-		<div class="text-center" v-if="personsWithStarships.length">
+		<div class="text-center" v-if="personsWithStarships.length && !isLoading">
 			<v-pagination
 				v-model="page"
 				:length="peopleCount"
@@ -116,19 +116,14 @@ export default class PersonsList extends Vue {
 		return this.page === 1 ? index + 1 : (page - 1) * 10 + (index + 1);
 	}
 
-	dispatchLoadPersons(page: number): void {
-		this.setIsLoading(true);
-		this.loadPersons(page);
-	}
-
 	onPaginationChange(pageNumber: number): void {
 		this.$router.push({ name: "home", query: { page: String(pageNumber) } });
-		this.dispatchLoadPersons(pageNumber);
+		this.loadPersons(pageNumber);
 	}
 
 	created() {
 		this.page = this.getPage();
-		this.dispatchLoadPersons(this.page);
+		this.loadPersons(this.page);
 	}
 }
 </script>
