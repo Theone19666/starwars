@@ -14,7 +14,6 @@ export default new Vuex.Store({
 	},
 	mutations: {
 		addStarships(state, payload: Starship[]) {
-			console.log(payload);
 			state.starships.push(...payload);
 		},
 	},
