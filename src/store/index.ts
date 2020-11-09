@@ -13,28 +13,29 @@ export default new Vuex.Store({
 		starships: [] as Starship[],
 	},
 	mutations: {
-		addStarship(state, payload: Starship) {
-			state.starships.push(payload);
+		addStarships(state, payload: Starship[]) {
+			console.log(payload);
+			state.starships.push(...payload);
 		},
 	},
 	actions: {
-		loadStarships: async (context) => {
-			const starshipsCount = 75;
-			const starshipsPromises = [];
-			for (let i = 1; i < starshipsCount; i++) {
-				starshipsPromises.push(
-					axios
-						.get(`${BASE_URL}/starships/${i}/`)
-						.then((starship: AxiosResponse) => {
-							context.commit("addStarship", starship.data);
-						})
-						.catch((error) => {
-							// throw new Error(error);
-							console.log(error);
-						})
-				);
+		loadStarships: async ({ commit }) => {
+			const result: Starship[] = [];
+			const starshipsPagesSize = 4;
+			for (let i = 1; i <= starshipsPagesSize; i++) {
+				const url = i === 1 ? `${BASE_URL}/starships/` : `${BASE_URL}/starships/?page=${i}`;
+				axios
+					.get(url)
+					.then((resp: AxiosResponse) => {
+						commit("addStarships", resp.data.results);
+						result.push(resp.data.results);
+					})
+					.catch((error) => {
+						// throw new Error(error);
+						console.log(error);
+					});
 			}
-			return Promise.all(starshipsPromises);
+			return result;
 		},
 	},
 	modules: { persons, personInfo },

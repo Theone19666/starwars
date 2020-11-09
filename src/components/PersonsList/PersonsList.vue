@@ -36,7 +36,7 @@
 									<v-badge
 										v-for="(starship, starshipIndex) of item.starships"
 										:key="starshipIndex"
-										:content="starship"
+										:content="starship  || 'unknown'"
 										inline
 										color="#008cff"
 										class="starship"
